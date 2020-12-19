@@ -15,7 +15,7 @@ tell application "Finder"
 		make new folder at "/usr/local/afpfs-ng-mac/link/" as POSIX file with properties {name:"AFP2 Mounts"}
 		activate
 		reveal "/usr/local/afpfs-ng-mac/link/AFP2 Mounts" as POSIX file
-		tell application "System Events" to keystroke "t" using command down
+		tell application "System Events" to keystroke "t" using {command down, control down}
 		close window 1
 	end if
 end tell
