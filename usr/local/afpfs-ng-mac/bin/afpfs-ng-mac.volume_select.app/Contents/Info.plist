@@ -11,13 +11,15 @@
 	<key>CFBundleIconFile</key>
 	<string>applet</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.apple.ScriptEditor.id.afpfs-ng-OSX-volume-select</string>
+	<string>com.apple.ScriptEditor.id.afpfs-ng-mac-volume-select</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>afpfs-ng-OSX.volume_select</string>
+	<string>afpfs-ng-mac.volume_select</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>aplt</string>
 	<key>LSMinimumSystemVersionByArchitecture</key>
@@ -36,9 +38,9 @@
 		<key>name</key>
 		<string>ScriptWindowState</string>
 		<key>positionOfDivider</key>
-		<real>518</real>
+		<real>346</real>
 		<key>savedFrame</key>
-		<string>170 116 602 886 0 0 1280 1002 </string>
+		<string>3 129 606 617 0 0 1024 746 </string>
 		<key>selectedTabView</key>
 		<string>result</string>
 	</dict>
