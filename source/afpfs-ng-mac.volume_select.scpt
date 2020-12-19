@@ -11,21 +11,21 @@ end replaceText
 
 -- after installation, create folder for mount aliases and add to sidebar
 tell application "Finder"
-	if not (exists "/etc/afpfs-ng-OSX/link/AFP2 Mounts" as POSIX file) then
-		make new folder at "/etc/afpfs-ng-OSX/link/" as POSIX file with properties {name:"AFP2 Mounts"}
+	if not (exists "/usr/local/afpfs-ng-mac/link/AFP2 Mounts" as POSIX file) then
+		make new folder at "/usr/local/afpfs-ng-mac/link/" as POSIX file with properties {name:"AFP2 Mounts"}
 		activate
-		reveal "/etc/afpfs-ng-OSX/link/AFP2 Mounts" as POSIX file
+		reveal "/usr/local/afpfs-ng-mac/link/AFP2 Mounts" as POSIX file
 		tell application "System Events" to keystroke "t" using command down
 		close window 1
 	end if
 end tell
 
 -- clear mount variables file in case previous run errored after volume selection
-do shell script "cat /dev/null > /etc/afpfs-ng-OSX/bin/AFP2_mount_vars"
+do shell script "cat /dev/null > /usr/local/afpfs-ng-mac/bin/AFP2_mount_vars"
 
 -- after restart, clean up "mount" and "link/AFP2 Mounts" if volumes were unmounted by other means than unmount.command
 try
-	do shell script "if ! test -e dev/osxfuse0; then rm -rf /etc/afpfs-ng-OSX/link/\"AFP2 Mounts\"/*; rmdir /etc/afpfs-ng-OSX/mount/*; fi"
+	do shell script "if ! test -e /dev/macfuse0; then rm -rf /usr/local/afpfs-ng-mac/link/\"AFP2 Mounts\"/*; rmdir /usr/local/afpfs-ng-mac/mount/*; fi"
 end try
 
 -- ping broadcast IP (x.x.x.255) to update device list for arp
@@ -55,10 +55,10 @@ end repeat
 
 -- if AFP2 servers were found display them in a list, else display error message
 try
-	tell application (path to frontmost application as text) to set afpServerChoice to choose from list afpServerList with title "afpfs-ng-OSX ¥ Server Selection" with prompt "Choose an AFP2.x server:" OK button name "Continue É"
+	tell application (path to frontmost application as text) to set afpServerChoice to choose from list afpServerList with title "afpfs-ng-mac ¥ Server Selection" with prompt "Choose an AFP2.x server:" OK button name "Continue É"
 on error errStr number errorNumber
 	if errorNumber is equal to -50 then
-		tell application (path to frontmost application as text) to display dialog "No active AFP2.x servers found." with title "afpfs-ng-OSX ¥ Error" buttons {"OK"} default button "OK" with icon "/etc/afpfs-ng-OSX/icon/server.icns" as POSIX file
+		tell application (path to frontmost application as text) to display dialog "No active AFP2.x servers found." with title "afpfs-ng-mac ¥ Error" buttons {"OK"} default button "OK" with icon "/usr/local/afpfs-ng-mac/icon/server.icns" as POSIX file
 		error number -128 -- stop script execution
 	end if
 end try
@@ -83,7 +83,7 @@ set afpVolumeLines to do shell script "/usr/local/bin/afpcmd afp://" & afpServer
 
 -- display error message if no shared volumes have been found on server
 if afpVolumeLines is "rror" then
-	tell application (path to frontmost application as text) to display dialog "No AFP2.x volumes found on Ò" & afpServerName & "Ó." with title "afpfs-ng-OSX ¥ Error" buttons {"OK"} default button "OK" with icon "/etc/afpfs-ng-OSX/icon/shared_volume.icns" as POSIX file
+	tell application (path to frontmost application as text) to display dialog "No AFP2.x volumes found on Ò" & afpServerName & "Ó." with title "afpfs-ng-mac ¥ Error" buttons {"OK"} default button "OK" with icon "/usr/local/afpfs-ng-mac/icon/shared_volume.icns" as POSIX file
 	error number -128 -- stop script execution
 end if
 
@@ -93,7 +93,7 @@ set AppleScript's text item delimiters to ", "
 set afpVolumeList to text items of afpVolumeLines
 set AppleScript's text item delimiters to tid -- reset to original state
 
-tell application (path to frontmost application as text) to set afpVolumeChoice to choose from list afpVolumeList with title "afpfs-ng-OSX ¥ Volume Selection" with prompt "Choose a volume from Ò" & afpServerName & "Ó:" OK button name "Mount"
+tell application (path to frontmost application as text) to set afpVolumeChoice to choose from list afpVolumeList with title "afpfs-ng-mac ¥ Volume Selection" with prompt "Choose a volume from Ò" & afpServerName & "Ó:" OK button name "Mount"
 -- if afpVolumeChoice is false then
 -- set afpUserPass to choose from list
 -- else
@@ -110,15 +110,15 @@ end try
 set afpMountNameRAW to afpVolumeName & "@" & afpServerName
 set afpMountName to replaceText(afpMountNameRAW, "'", "\\'")
 
--- prevent multiple aliases if attempting to mount the same volume more than once (the actual mounting isn't done twice by osxfuse)
+-- prevent multiple aliases if attempting to mount the same volume more than once (the actual mounting isn't done twice by macfuse)
 tell application "Finder"
-	if exists "/etc/afpfs-ng-OSX/link/AFP2 Mounts/" & afpMountNameRAW as POSIX file then
+	if exists "/usr/local/afpfs-ng-mac/link/AFP2 Mounts/" & afpMountNameRAW as POSIX file then
 		error number -128 -- stop script execution
 	else
-		-- create mount point, load osxfuse if not yet running, load afpfs daemon
-		-- export variables for beeing processed by afpfs-ng-OSX.mount_cmd.app
-		-- launch afpfs-ng-OSX.mount_cmd.app to create mounts and aliases
-		do shell script "mkdir /etc/afpfs-ng-OSX/mount/\"" & afpMountNameRAW & "\" && if ! test -e dev/osxfuse0; then /Library/Filesystems/osxfuse.fs/Contents/Resources/load_osxfuse && /usr/local/bin/afpfsd; fi
-echo afpServerIP=\\\"" & afpServerIP & "\\\" >> /etc/afpfs-ng-OSX/bin/AFP2_mount_vars; echo afpVolumeName=\\\"" & afpVolumeName & "\\\" >> /etc/afpfs-ng-OSX/bin/AFP2_mount_vars; echo afpMountName=\\\"" & afpMountName & "\\\" >> /etc/afpfs-ng-OSX/bin/AFP2_mount_vars; open /etc/afpfs-ng-OSX/bin/afpfs-ng-OSX.mount_cmd.app"
+		-- create mount point, load macfuse if not yet running, load afpfs daemon
+		-- export variables for beeing processed by afpfs-ng-mac.mount_cmd.app
+		-- launch afpfs-ng-mac.mount_cmd.app to create mounts and aliases
+		do shell script "mkdir /usr/local/afpfs-ng-mac/mount/\"" & afpMountNameRAW & "\" && if ! test -e /dev/macfuse0; then /Library/Filesystems/macfuse.fs/Contents/Resources/load_macfuse && /usr/local/bin/afpfsd; fi
+echo afpServerIP=\\\"" & afpServerIP & "\\\" >> /usr/local/afpfs-ng-mac/bin/AFP2_mount_vars; echo afpVolumeName=\\\"" & afpVolumeName & "\\\" >> /usr/local/afpfs-ng-mac/bin/AFP2_mount_vars; echo afpMountName=\\\"" & afpMountName & "\\\" >> /usr/local/afpfs-ng-mac/bin/AFP2_mount_vars; open /usr/local/afpfs-ng-mac/bin/afpfs-ng-mac.mount_cmd.app"
 	end if
 end tell
