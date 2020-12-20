@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# change ownership of GUI so it is writable for mounting
+sudo chown -R 501 /usr/local/afpfs-ng-mac
+
 # check if AppleScript menu active
 if grep -q 'Script Menu.menu' ~/Library/Preferences/com.apple.systemuiserver.plist
 
